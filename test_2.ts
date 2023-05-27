@@ -101,6 +101,7 @@ async function getCompletion(prompt: string) {
     model: "claude-v1",
     max_tokens_to_sample: 300,
     stop_sequences: ["\nHuman:"],
+    temperature: 0
   };
 
   const headers = {
