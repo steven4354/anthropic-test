@@ -1,33 +1,30 @@
-import "dotenv/config";
-import { Client, HUMAN_PROMPT, AI_PROMPT } from "@anthropic-ai/sdk";
+const axios = require('axios');
 
-const apiKey = process.env.ANTHROPIC_API_KEY;
-if (!apiKey) {
-  throw new Error("The ANTHROPIC_API_KEY environment variable must be set");
+// dotenv
+require('dotenv').config();
+
+const API_KEY = process.env.ANTHROPIC_API_KEY;
+const BASE_URL = 'https://api.anthropic.com/v1/complete';
+
+async function getCompletion(prompt: string) {
+  const data = {
+    prompt: `\n\nHuman: ${prompt}\n\nAssistant:`,
+    model: 'claude-v1',
+    max_tokens_to_sample: 300,
+    stop_sequences: ['\n\nHuman:'],
+  };
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'X-API-Key': API_KEY,
+  };
+
+  try {
+    const response = await axios.post(BASE_URL, data, { headers });
+    console.log(response.data.completion);
+  } catch (error: any) {
+    console.error('Error:', error.response.data);
+  }
 }
 
-const client = new Client(apiKey);
-
-client
-  .completeStream(
-    {
-      prompt: `${HUMAN_PROMPT} How many toes do dogs have?${AI_PROMPT}`,
-      stop_sequences: [HUMAN_PROMPT],
-      max_tokens_to_sample: 200,
-      model: "claude-v1",
-    },
-    {
-      onOpen: (response) => {
-        console.log("Opened stream, HTTP status code", response.status);
-      },
-      onUpdate: (completion) => {
-        console.log(completion.completion);
-      },
-    }
-  )
-  .then((completion) => {
-    console.log("Finished sampling:\n", completion);
-  })
-  .catch((error) => {
-    console.error(error);
-  });
+getCompletion('Tell me a haiku about trees');
