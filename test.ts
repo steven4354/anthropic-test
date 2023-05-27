@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { AI_PROMPT, Client, HUMAN_PROMPT } from "../src";
+import { Client, HUMAN_PROMPT, AI_PROMPT } from "@anthropic-ai/sdk";
 
 const apiKey = process.env.ANTHROPIC_API_KEY;
 if (!apiKey) {
