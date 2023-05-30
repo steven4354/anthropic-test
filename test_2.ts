@@ -48,6 +48,7 @@ Increase * to indicate that the component is a child of the prior component. Res
 `);
 
 const prompt2 = heredoc`
+
 COMPONENT_SCAFFOLD:
 ~~~
 *FORM(a form for users to sign up to a newsletter,newsletterSignupForm)

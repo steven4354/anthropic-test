@@ -43,7 +43,9 @@ Increase * to indicate that the component is a child of the prior component. Res
 
 user: TASK: Make a newsletter signup form
 
-assistant: COMPONENT_SCAFFOLD:
+assistant: 
+
+COMPONENT_SCAFFOLD:
 \`\`\`
 *FORM(a form for users to sign up to a newsletter,newsletterSignupForm)
 **TEXT(says newsletter signup form,formTitle)

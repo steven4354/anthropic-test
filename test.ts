@@ -9,11 +9,57 @@ const API_KEY = process.env.ANTHROPIC_API_KEY;
 const BASE_URL = 'https://api.anthropic.com/v1/complete';
 
 const prompt1 = heredoc(`
-// ... (same as before)
+You are a power user of no-code tools and are making a COMPONENT_SCAFFOLD that will be used to render components for a web app.
+
+The following are the ONLY COMPONENT_TYPE's you can use in the COMPONENT_SCAFFOLD. Do NOT use type that isn't specified below:
+
+~~~
+CONTAINER
+FORM
+MEDIA
+TEXT
+IFRAME
+BUTTON
+CHECKBOX
+DROPDOWN[opt1, opt2, ...]
+FILE_INPUT
+INPUT
+SWITCH
+CHART
+DATA_TABLE
+STATISTIC
+~~~
+
+RULES:
+
+1. ENSURE you respond with a COMPONENT_SCAFFOLD formatted to look like:
+
+~~~
+*COMPONENT_TYPE(description,name)
+~~~
+
+Increase * to indicate that the component is a child of the prior component. Respond exclusively with the COMPONENT_SCAFFOLD. NEVER include anything else in the response. NEVER clarify your assumptions, notes, or interpretation of the TASK.
+
+2. ENSURE you use camelCase for the name field
+
+3. ENSURE that if you are using a FORM, you are using a form instead of a container node. Do not use both a form and a container node together.
+
+4. NEVER use TEXT for input labels.
+
+5. ONLY CONTAINER and FORM can have children components.
 `);
 
 const prompt2 = heredoc`
-// ... (same as before)
+COMPONENT_SCAFFOLD:
+~~~
+*FORM(a form for users to sign up to a newsletter,newsletterSignupForm)
+**TEXT(says newsletter signup form,formTitle)
+**TEXT(says join our newsletter,formDescription)
+**INPUT(says Enter your email,emailInput)
+**DROPDOWN[Weekly, Quarterly](for user to select how frequently they want to be emailed,frequencyDropdown)
+**BUTTON(says Sign up,submitButton)
+**TEXT(terms of service text,tosText)
+~~~
 `;
 
 type ConversationEntry = {
@@ -40,6 +86,8 @@ const conversation: ConversationEntry[] = [
   },
 ];
 
+console.log(conversation);
+
 function formatConversation(conversation: ConversationEntry[]) {
   return conversation
     .map((entry) => `\n\n${entry.role.charAt(0).toUpperCase() + entry.role.slice(1)}: ${entry.text}`)
@@ -49,7 +97,7 @@ function formatConversation(conversation: ConversationEntry[]) {
 async function getCompletion(prompt: string) {
   const data = {
     prompt: `\n\nHuman: ${prompt}\n\nAssistant:`,
-    model: 'claude-v1',
+    model: 'claude-v1', // claude-instant-v1, claude-v1-100k
     max_tokens_to_sample: 300,
     stop_sequences: ['\nHuman:'],
   };
@@ -67,20 +115,4 @@ async function getCompletion(prompt: string) {
   }
 }
 
-const tasks = [
-  'TASK: lorem ipsum text',
-  'TASK: tesla order form',
-  'TASK: employee expense management form',
-  'TASK: 5 buttons with different colors',
-  'TASK: employee onboarding checklist',
-];
-
-async function main() {
-  for (const task of tasks) {
-    const newConversation = [...conversation.slice(0, -1), { role: 'human', text: task }];
-    console.log(`\nRunning task: ${task}`);
-    await getCompletion(formatConversation(newConversation));
-  }
-}
-
-main();
+getCompletion(formatConversation(conversation));
